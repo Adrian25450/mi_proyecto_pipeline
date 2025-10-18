@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-
         stage('Clonar código') {
             steps {
                 git branch: 'main', url: 'https://github.com/Adrian25450/mi_proyecto_pipeline.git'
@@ -39,9 +38,22 @@ pipeline {
             }
         }
 
+        stage('Desplegar contenedor') {
+            steps {
+                sh '''
+                    echo "=== Desplegando contenedor ==="
+                    docker stop miweb_jenkins || true
+                    docker rm miweb_jenkins || true
+                    docker build -t miweb_jenkins .
+                    docker run -d --name miweb_jenkins -p 8081:80 miweb_jenkins
+                '''
+                echo 'Contenedor desplegado correctamente.'
+            }
+        }
+
         stage('Completar') {
             steps {
-                echo 'PIPELINE COMPLETADO EXITOSAMENTE'
+                echo '✅ PIPELINE COMPLETADO EXITOSAMENTE'
             }
         }
     }
